@@ -1,11 +1,18 @@
 #!/bin/bash
+echo "Verarbeite $1"
+
 echo "Konvertiere .pbf in .o5m"
-./osmconvert deutschland/germany-latest.osm.pbf -o=deutschland/germany.o5m
-echo "pruning map"
-./osmfilter deutschland/germany.o5m --keep="smoothness=good =bad =intermediate =excellent =very_bad =horrible =very_horrible admin_level=2 place=city and population>=500000" -o=deutschland/germany-smoothnesstag.o5m
+./osmconvert $1 -o=out.o5m
+
+echo "Filter the Map"
+./osmfilter out.o5m --keep="highway= and maxspeed=" --drop-author -o=out-maxspeed.o5m
+
 echo "Konvertiere .o5m in .pbf"
-./osmconvert deutschland/germany-smoothnesstag.o5m -o=deutschland/germany-smoothnesstag.osm.pbf
+./osmconvert out-maxspeed.o5m -o=out-maxspeed.osm.pbf
+./osmconvert out-maxspeed.o5m -o=out-maxspeed.osm
+
 echo "Cleaning up"
-rm deutschland/germany-smoothnesstag.o5m
-rm deutschland/germany.o5m
-echo "done."
+rm out-maxspeed.o5m
+rm out.o5m
+
+echo "Done."
